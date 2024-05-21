@@ -1,0 +1,121 @@
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f0f2f5;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+.App{
+  height: 100%;
+}
+.dndflow {
+  display: flex;
+  height: 80vh;
+}
+
+.reactflow-wrapper {
+  flex-grow: 1;
+  height: 100%;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  
+}
+
+.reactflow-wrapper .react-flow {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar {
+  width: 200px;
+  background-color: #fff;
+  padding: 20px;
+  border-right: 1px solid #000000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  border-radius: 8px;
+  flex-direction: column;
+  justify-content: space-between; /* Add this line */
+  align-items: flex-start;
+}
+
+.logout-button {
+  align-self:center; /* Change this from 'last baseline' to 'flex-end' */
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.description {
+  font-size: 14px;
+  margin-bottom: 40px;
+  color: #555;
+}
+
+.dndnode {
+  
+  width: 150px;
+  height: 50px;
+  padding: 10px 15px;
+  text-align: center;
+  
+  
+  background-color: #8d97a1;
+  color: white;
+  border-radius: 4px;
+  cursor: grab;
+  transition : background-color 0.2s ease;
+}
+
+.dndnode:hover {
+  background-color: #40a9ff;
+}
+
+.save-button {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  background-color: #52c41a;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.save-button:disabled {
+  background-color: #b7eb8f;
+  cursor: not-allowed;
+}
+
+.context-menu {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.context-menu button {
+  display: block;
+  width: 100%;
+  padding: 10px 15px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.context-menu button:hover {
+  background-color: #f5f5f5;
+}
