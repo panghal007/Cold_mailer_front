@@ -10,7 +10,7 @@ body {
 }
 .dndflow {
   display: flex;
-  height: 80vh;
+  height: 70vh;
 }
 
 .reactflow-wrapper {
@@ -23,11 +23,10 @@ body {
   
 }
 
-.reactflow-wrapper .react-flow {
-  background-color: #fff;
+/* .reactflow-wrapper .react-flow {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
+} */
 
 .sidebar {
   width: 200px;
@@ -61,13 +60,13 @@ body {
 
 .dndnode {
   
-  width: 150px;
-  height: 50px;
+  width: 160px;
+  height: 80px;
   padding: 10px 15px;
   text-align: center;
   
-  
-  background-color: #8d97a1;
+  font-size: large;
+  background-color: #647382;
   color: white;
   border-radius: 4px;
   cursor: grab;
@@ -75,8 +74,9 @@ body {
 }
 
 .dndnode:hover {
-  background-color: #40a9ff;
+  background-color: #1f8d87;
 }
+
 
 .save-button {
   position: absolute;
@@ -84,10 +84,11 @@ body {
   left: 50%;
   transform: translateX(-50%);
   padding: 10px 20px;
-  background-color: #52c41a;
-  color: white;
+  background-color: #379799;
+    color: white;
   border: none;
   border-radius: 4px;
+  font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
