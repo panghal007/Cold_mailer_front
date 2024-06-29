@@ -26,11 +26,14 @@ const TemplateModal = ({ onTemplateCreated }) => {
 
   const [templateName, setTemplateName] = useState('');
   const [subject, setSubject] = useState('');
+  const [to, setTo] = useState('');
+
   const [body, setBody] = useState('');
 
   const handleCreateTemplate = async () => {
     const newTemplate = {
       name: templateName,
+      to,
       subject,
       body,
     };
@@ -75,6 +78,15 @@ const TemplateModal = ({ onTemplateCreated }) => {
                 placeholder="Template Name"
                 value={templateName}
                 onChange={(e) => setTemplateName(e.target.value)}
+                required
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>To</FormLabel>
+              <Input
+                placeholder="alex@gamil.com"
+                value={to}
+                onChange={(e) => setTo(e.target.value)}
                 required
               />
             </FormControl>

@@ -9,6 +9,8 @@ import ReactFlow, {
   Controls,
   Background,
   Panel,
+  useReactFlow,
+
 } from 'reactflow';
 import {
   Box,
@@ -28,10 +30,9 @@ import {
   HStack,
   useColorMode,
   useColorModeValue,
-  
 } from '@chakra-ui/react';
 import styled from 'styled-components';
-
+import Joyride from 'react-joyride';
 
 import ColdEmailNode from './NodeTypes/ColdEmailNode';
 import WaitDelayNode from './NodeTypes/WaitDelayNode';
@@ -47,8 +48,7 @@ const initialNodes = [
     id: '1',
     type: 'leadSourceNode',
     data: { label: 'Lead Source' },
-    position: { x: 250, y: 5 },
-    
+    position: { x: 0.5, y: 0.01 },
   },
 ];
 
@@ -57,6 +57,7 @@ const nodeTypes = {
   waitDelayNode: WaitDelayNode,
   leadSourceNode: LeadSourceNode,
 };
+
 const ReactFlowStyled = styled(ReactFlow)`
   background-color: ${(props) => (props.colorMode === 'light' ? 'white' : '#1a202c')};
 `;
@@ -130,16 +131,18 @@ const FlowChart = ({ children }) => {
   const [templates, setTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [activeStep, setActiveStep] = useState(0);
+  const [tourRun, setTourRun] = useState(true);
   const reactFlowWrapper = useRef(null);
   const navigate = useNavigate();
   const toast = useToast();
-  const {  lightTheme, darkTheme } = useThemeContext();
+  const { lightTheme, darkTheme } = useThemeContext();
   const { colorMode, toggleTheme } = useColorMode();
   const steps = [
     { title: 'Scheduled', description: 'Email is scheduled' },
     { title: 'Sent', description: 'Email has been sent' },
     { title: 'Opened', description: 'Email has been opened' },
   ];
+  const { setViewport } =useReactFlow();
 
   const fetchEmailStatus = useCallback(async () => {
     try {
@@ -154,30 +157,27 @@ const FlowChart = ({ children }) => {
   useEffect(() => {
     fetchEmailStatus();
     const interval = setInterval(fetchEmailStatus, 60000);
-// Load flowchart from local storage
     const savedFlowchart = localStorage.getItem('flowchart');
     if (savedFlowchart) {
       const flowchartData = JSON.parse(savedFlowchart);
       setNodes(flowchartData.nodes || []);
       setEdges(flowchartData.edges || []);
+      if (reactFlowInstance) {
+        reactFlowInstance.setViewport({ x: 0, y: 0, zoom: 1.2 });
+      }
     }
-    // Load current email id from local storage
     const savedEmailId = localStorage.getItem('currentEmailId');
-    console.log(savedEmailId);
     if (savedEmailId) {
       setCurrentEmailId(savedEmailId);
     }
-
-    // Load selected template from local storage
     const savedTemplate = localStorage.getItem('selectedTemplate');
     if (savedTemplate) {
       setSelectedTemplate(savedTemplate);
     }
-     // Load active step from local storage
-     const savedActiveStep = localStorage.getItem('activeStep');
-     if (savedActiveStep) {
-       setActiveStep(parseInt(savedActiveStep, 10));
-     }
+    const savedActiveStep = localStorage.getItem('activeStep');
+    if (savedActiveStep) {
+      setActiveStep(parseInt(savedActiveStep, 10));
+    }
     return () => clearInterval(interval);
   }, [fetchEmailStatus]);
 
@@ -195,24 +195,26 @@ const FlowChart = ({ children }) => {
     fetchTemplates();
   }, [fetchTemplates]);
 
-    // Update active step whenever current email id changes
-    useEffect(() => {
-      if (currentEmailId) {
-        const currentEmail = emailStatus.find((email) => email._id === currentEmailId);
-        if (currentEmail) {
-          const newStep = getActiveStep(currentEmail.status);
-          setActiveStep(newStep);
-          localStorage.setItem('activeStep', newStep.toString()); // Save active step to local storage
-        }
+  useEffect(() => {
+    if (currentEmailId) {
+      const currentEmail = emailStatus.find((email) => email._id === currentEmailId);
+      if (currentEmail) {
+        const newStep = getActiveStep(currentEmail.status);
+        setActiveStep(newStep);
+        localStorage.setItem('activeStep', newStep.toString());
       }
-    }, [currentEmailId, emailStatus]);
+    }
+  }, [currentEmailId, emailStatus]);
 
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(params, eds)),
     [setEdges]
   );
 
-  const onInit = useCallback((rfi) => setReactFlowInstance(rfi), []);
+  const onInit = useCallback((rfi) => {
+    setReactFlowInstance(rfi);
+    rfi.setViewport({ x: 0, y: 0, zoom: 0.8 });
+  }, []);
 
   const onDrop = useCallback(
     (event) => {
@@ -272,9 +274,8 @@ const FlowChart = ({ children }) => {
     try {
       setSaving(true);
 
-
       const flowchartData = reactFlowInstance.toObject();
-      localStorage.setItem('flowchart', JSON.stringify(flowchartData)); // Save flowchart to local storage
+      localStorage.setItem('flowchart', JSON.stringify(flowchartData));
       let currentEmailId = null;
 
       for (const node of flowchartData.nodes) {
@@ -294,12 +295,11 @@ const FlowChart = ({ children }) => {
           });
           const data = await response.json();
           currentEmailId = data.emailId;
-          console.log(currentEmailId);
         }
       }
 
       setCurrentEmailId(currentEmailId);
-      localStorage.setItem('currentEmailId', currentEmailId); // Save current email id to local storage
+      localStorage.setItem('currentEmailId', currentEmailId);
       toast({
         title: 'Flowchart saved',
         description: 'Flowchart saved and emails scheduled successfully!',
@@ -307,7 +307,7 @@ const FlowChart = ({ children }) => {
         duration: 4000,
         isClosable: true,
         position: 'top',
-        colorScheme:'teal',
+        colorScheme: 'teal',
       });
 
       fetchEmailStatus();
@@ -343,23 +343,67 @@ const FlowChart = ({ children }) => {
   const handleTemplateChange = (e) => {
     const templateId = e.target.value;
     setSelectedTemplate(templateId);
-    localStorage.setItem('selectedTemplate', templateId); // Save selected template to local storage
+    localStorage.setItem('selectedTemplate', templateId);
   };
 
   const handleStepperChange = (newStep) => {
     setActiveStep(newStep);
-    localStorage.setItem('activeStep', newStep.toString()); // Save active step to local storage
+    localStorage.setItem('activeStep', newStep.toString());
   };
+
   const currentTheme = colorMode === 'light' ? lightTheme : darkTheme;
   const MiniMapComponent = colorMode === 'light' ? MiniMapLight : MiniMapDark;
   const ControlsComponent = colorMode === 'light' ? ControlsLight : ControlsDark;
 
+  const tourSteps = [
+    {
+      target: '.reactflow-wrapper',
+      content: 'This is where you can create and visualize your flowchart.',
+    },
+    {
+      target: '.dndflow',
+      content: 'Drag and drop nodes from here to the flowchart area.',
+    },
+    {
+      target: '.save-button',
+      content: 'Click here to save your flowchart.',
+    },
+    {
+      target: '.sidebar select',
+      content: 'Select a template for your email.',
+    },
+    {
+      target: '.chakra-stepper',
+      content: 'Track the status of your scheduled emails here.',
+    },
+  ];
+
+
+ 
+
   return (
     <ReactFlowProvider>
       <Navbar />
+      <Joyride
+        steps={tourSteps}
+        run={tourRun}
+        continuous
+        showSkipButton
+        styles={{
+          options: {
+            arrowColor: currentTheme.nodeBg,
+            backgroundColor: currentTheme.nodeBg,
+            overlayColor: 'rgba(0, 0, 0, 0.5)',
+            primaryColor: currentTheme.nodeColor,
+            textColor: currentTheme.nodeColor,
+            width: 500,
+            zIndex: 1000,
+          },
+        }}
+      />
       <div className="dndflow">
-        <div className="reactflow-wrapper" ref={reactFlowWrapper} >
-        <ReactFlowStyled
+        <div className="reactflow-wrapper" ref={reactFlowWrapper}>
+          <ReactFlowStyled
             colorMode={colorMode}
             nodes={nodes}
             edges={edges}
@@ -373,8 +417,9 @@ const FlowChart = ({ children }) => {
             onConnect={onConnect}
             nodeTypes={nodeTypes}
             fitView
-    >
-      <MiniMapComponent nodeColor={(n) => {
+          >
+            <MiniMapComponent
+              nodeColor={(n) => {
                 switch (n.type) {
                   case 'coldEmailNode':
                     return 'red';
@@ -385,21 +430,17 @@ const FlowChart = ({ children }) => {
                   default:
                     return '#eee';
                 }
-              }} />
-              <ControlsComponent theme={colorMode === 'light' ? lightTheme : darkTheme} />
-              <Background color={colorMode === 'light' ? '#aaa' : '#888'} gap={16} />
-              <Panel position="top-left" style={{ display: 'flex', flexDirection: 'column' }}>
-                
-              </Panel>
-    </ReactFlowStyled>
+              }}
+            />
+            <ControlsComponent theme={colorMode === 'light' ? lightTheme : darkTheme} />
+            <Background color={colorMode === 'light' ? '#aaa' : '#888'} gap={16} />
+            <Panel position="top-left" style={{ display: 'flex', flexDirection: 'column' }}>
+              {/* Add any content here */}
+            </Panel>
+          </ReactFlowStyled>
           {menu && (
-            <div
-              className="context-menu"
-              style={{ top: menu.top, left: menu.left }}
-            >
-              <button
-                onClick={() => setNodes((nds) => nds.filter((node) => node.id !== menu.nodeId))}
-              >
+            <div className="context-menu" style={{ top: menu.top, left: menu.left }}>
+              <button onClick={() => setNodes((nds) => nds.filter((node) => node.id !== menu.nodeId))}>
                 Delete Node
               </button>
             </div>
@@ -417,7 +458,6 @@ const FlowChart = ({ children }) => {
           >
             Lead Source Node
           </div>
-          
           <div
             className="dndnode"
             onDragStart={(event) => event.dataTransfer.setData('application/reactflow', 'waitDelayNode')}
@@ -425,7 +465,6 @@ const FlowChart = ({ children }) => {
           >
             Wait Delay Node
           </div>
-
           <div
             className="dndnode"
             onDragStart={(event) => event.dataTransfer.setData('application/reactflow', 'coldEmailNode')}
@@ -433,14 +472,12 @@ const FlowChart = ({ children }) => {
           >
             Cold Email Node
           </div>
-          
           <TemplateModal onTemplateCreated={fetchTemplates} />
-
-          <Select 
-            bg={colorMode === 'light' ? 'white' : 'black'} 
+          <Select
+            bg={colorMode === 'light' ? 'white' : 'black'}
             color={colorMode === 'light' ? 'black' : 'white'}
-            placeholder="Select Template" 
-            value={selectedTemplate} 
+            placeholder="Select Template"
+            value={selectedTemplate}
             onChange={(e) => setSelectedTemplate(e.target.value)}
           >
             {templates.map((template) => (
@@ -459,12 +496,10 @@ const FlowChart = ({ children }) => {
                 <StepIndicator>
                   <StepStatus complete={<StepIcon />} incomplete={<StepNumber />} active={<StepNumber />} />
                 </StepIndicator>
-
                 <Box flexShrink="0">
                   <StepTitle>{step.title}</StepTitle>
                   <StepDescription>{step.description}</StepDescription>
                 </Box>
-
                 <StepSeparator />
               </Step>
             ))}
@@ -475,7 +510,12 @@ const FlowChart = ({ children }) => {
   );
 };
 
-export default FlowChart;
+export default () => (
+  <ReactFlowProvider>
+    <FlowChart />
+  </ReactFlowProvider>
+);
+
 
 // import React, { useState, useEffect, useCallback, useRef } from 'react';
 // import { useNavigate } from 'react-router-dom';
