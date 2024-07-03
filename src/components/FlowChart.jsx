@@ -216,7 +216,7 @@ const FlowChart = ({ children }) => {
       } else {
         // User details incomplete, show modal
         setUserDetailsComplete(false);
-        setShowDetailsModal(true);
+        // setShowDetailsModal(true);
       }
       setLoading(false);
     } catch (error) {
