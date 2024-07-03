@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';  // Import Link
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -13,8 +14,9 @@ import {
   CloseButton,
   useColorModeValue,
   IconButton,
-  InputGroup,         // Import InputGroup
-  InputRightElement,  // Import InputRightElement
+  InputGroup,
+  InputRightElement,
+  useColorMode,
 } from '@chakra-ui/react';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 
@@ -23,25 +25,31 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { colorMode } = useColorMode();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const response = await axios.post('https://cold-mailer-back.onrender.com/api/login', { email, password });
-      const { token } = response.data;
+      const { token, userId } = response.data;
       localStorage.setItem('token', token);
+      localStorage.setItem('userId', userId); // Store userId in localStorage
+  
       localStorage.setItem('email', email);
       navigate('/');
     } catch (error) {
       setError(error.response.data.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <Box
-      bg={useColorModeValue('gray.100', 'gray.900')}
-      minH="100vh"
+    bg={colorMode === 'light' ? 'white' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'}      minH="100vh"
       display="flex"
       justifyContent="center"
       alignItems="center"
@@ -53,7 +61,7 @@ const Login = () => {
         overflow="hidden"
         p={8}
         bg="white"
-        boxShadow="lg"
+        boxShadow="dark-lg"
         width="90%"
         mx="auto"
       >
@@ -71,21 +79,22 @@ const Login = () => {
             />
           </Alert>
         )}
-        <form onSubmit={handleSubmit}>
+        <form  onSubmit={handleSubmit}>
           <VStack spacing={4}>
-            <FormControl id="email" isRequired>
+            <FormControl id="email" isRequired color={colorMode === 'light' ? 'black' : 'black' }>
               <FormLabel>Email</FormLabel>
               <Input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 autoFocus
+                color={colorMode === 'light' ? 'black' : 'black' }
                 variant="filled"
                 _hover={{ bg: 'gray.50' }}
-                _focus={{ bg: 'gray.100', borderColor: 'teal.500' }}
+                _focus={{ bg: 'gray.100', borderColor: 'teal.800' }}
               />
             </FormControl>
-            <FormControl id="password" isRequired>
+            <FormControl id="password" isRequired color={colorMode === 'light' ? 'black' : 'black' }>
               <FormLabel>Password</FormLabel>
               <InputGroup>
                 <Input
@@ -93,8 +102,9 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   variant="filled"
+                  color={colorMode === 'light' ? 'black' : 'black' }
                   _hover={{ bg: 'gray.50' }}
-                  _focus={{ bg: 'gray.100', borderColor: 'teal.500' }}
+                  _focus={{ bg: 'gray.100', borderColor: 'teal.800' }}
                 />
                 <InputRightElement width="3rem">
                   <IconButton
@@ -113,13 +123,16 @@ const Login = () => {
               size="lg"
               width="100%"
               mt={4}
-              isLoading={false} // You can set this to true while awaiting response
+              isLoading={loading}
               loadingText="Logging in..."
             >
               Login
             </Button>
           </VStack>
         </form>
+        <Box mt={4} textAlign="center" color={colorMode === 'light' ? 'black' : 'black' }>
+          <Link to="/register">Not a user? Register here</Link>
+        </Box>
       </Box>
     </Box>
   );
