@@ -187,8 +187,14 @@ const FlowChart = ({ children }) => {
 
   const fetchTemplates = useCallback(async () => {
     try {
-      const response = await fetch("https://cold-mailer-back.onrender.com/api/templates");
-      const data = await response.json();
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        console.error("User ID not found in localStorage");
+        return;
+      }
+      const response = await axios.get(`https://cold-mailer-back.onrender.com/api/templates/${userId}`);
+      const data = response.data;
+      console.log(data);
       setTemplates(data);
     } catch (error) {
       console.error("Error fetching templates:", error);
