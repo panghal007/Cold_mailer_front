@@ -31,11 +31,14 @@ const TemplateModal = ({ onTemplateCreated }) => {
   const [body, setBody] = useState('');
 
   const handleCreateTemplate = async () => {
+    const userId = localStorage.getItem('userId');
+
     const newTemplate = {
       name: templateName,
       to,
       subject,
       body,
+      userId,
     };
 
     try {
