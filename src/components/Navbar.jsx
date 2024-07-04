@@ -4,7 +4,6 @@ import {
   Box,
   Flex,
   HStack,
-  Link,
   IconButton,
   Button,
   useDisclosure,
@@ -16,25 +15,35 @@ import {
   AlertDialogHeader,
   AlertDialogContent,
   AlertDialogOverlay,
+  useColorMode,
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon, SunIcon, MoonIcon } from '@chakra-ui/icons';
-import { useColorMode } from '@chakra-ui/react';
+import { Link as ScrollLink } from 'react-scroll';
 
-const Links = ['Home', 'About', 'Services', 'Contact'];
+const Links = ['Home', 'About', 'Pricing', 'Contact'];
 
 const NavLink = ({ children }) => (
-  <Link
-    px={2}
-    py={1}
-    rounded={'md'}
-    _hover={{
-      textDecoration: 'none',
-      bg: useColorModeValue('gray.200', 'gray.700'),
-    }}
-    href={`#${children.toLowerCase()}`}
+  <ScrollLink
+    to={children.toLowerCase()}
+    smooth={true}
+    duration={500}
+    spy={true}
+    exact="true"
+    offset={0}
   >
-    {children}
-  </Link>
+    <Box
+      px={2}
+      py={1}
+      rounded={'md'}
+      _hover={{
+        textDecoration: 'none',
+        bg: useColorModeValue('gray.200', 'gray.700'),
+        cursor: 'pointer'
+      }}
+    >
+      {children}
+    </Box>
+  </ScrollLink>
 );
 
 const Navbar = () => {
@@ -48,7 +57,7 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.clear();
     setIsLoggedIn(false);
-    onAlertClose(); // Close the alert dialog
+    onAlertClose();
   };
 
   const handleSignIn = () => {
@@ -78,7 +87,7 @@ const Navbar = () => {
             <img
               src={colorMode === 'light' ? "logo.png" : "logo_dark.png"}
               alt="Logo"
-              style={{ height: '50px', width: 'auto' }}
+              style={{ height: '50px', width: 'auto', cursor: 'pointer' }}
             />
           </Box>
           <HStack
@@ -129,7 +138,7 @@ const Navbar = () => {
             </AlertDialogHeader>
 
             <AlertDialogBody>
-             Mat kar bhai ro dunga 🥺
+            Mat kar bhai ro dunga 🥺
             </AlertDialogBody>
 
             <AlertDialogFooter>
