@@ -5,7 +5,7 @@ import { ChakraProvider, Box, Container, Heading, Text, Button, SimpleGrid, HSta
 import { FaCheckCircle, FaEnvelope, FaChartLine, FaNode, FaFacebook, FaTwitter, FaLinkedin } from 'react-icons/fa';
 import { ArrowForwardIcon } from '@chakra-ui/icons'
 import { FaGithub, FaCode } from 'react-icons/fa';
-import { ThemeProvider } from './ThemeContext'; // Import ThemeProvider
+import { ThemeProvider } from './ThemeContext'; 
 
 import Navbar from './Navbar';
 const animationKeyframes = keyframes`
@@ -18,12 +18,12 @@ const animation = `${animationKeyframes} 0.5s forwards`;
 
 
 const HeroSection = () => {
-  const { colorMode } = useColorMode(); // Access the current color mode
+  const { colorMode } = useColorMode(); 
   const bgColor = colorMode === "dark" ? "black" : "gray.600";
 
 
   return (
-  <Box position="relative" py={{ base: 20, md: 80 }} px={0} overflow="hidden">
+  <Box id="home" position="relative" py={{ base: 20, md: 80 }} px={0} overflow="hidden">
     <Box
       position="absolute"
       top="0"
@@ -32,7 +32,7 @@ const HeroSection = () => {
       height="100%"
       zIndex="-1"
       filter="blur(12px)"
-      paddingBottom="57%"  // Adjust padding to maintain aspect ratio
+      paddingBottom="57%"  
     >
       <iframe
         src="https://giphy.com/embed/kcmyqwqNg3OzcYDL6T"
@@ -66,10 +66,10 @@ const HeroSection = () => {
 };
 
 const FeaturesSection = () => {
-  const { colorMode } = useColorMode(); // Access the current color mode
+  const { colorMode } = useColorMode(); 
 
   return (
-    <Box p={60} bg={colorMode === 'dark' ? 'gray.600' : 'gray.200'} color={colorMode === 'dark' ? 'whiteAlpha.900' : 'black'}>
+    <Box id="about" p={60} bg={colorMode === 'dark' ? 'gray.600' : 'gray.200'} color={colorMode === 'dark' ? 'whiteAlpha.900' : 'black'}>
       <Heading as="h2" size="xl" textAlign="center" mb={8}>How It Works</Heading>
       <Container maxW="container.lg">
         <SimpleGrid columns={{ base: 1, md: 3 }} spacing={10}>
@@ -227,7 +227,7 @@ const PricingSection = () => {
   const { colorMode } = useColorMode(); // Access the current color mode
 
   return (
-  <Box py={60} bg={colorMode === 'dark' ? 'gray.600' : 'gray.200'} color={colorMode === 'dark' ? 'whiteAlpha.900' : 'black'} >
+  <Box id="pricing" py={60} bg={colorMode === 'dark' ? 'gray.600' : 'gray.200'} color={colorMode === 'dark' ? 'whiteAlpha.900' : 'black'} >
     <Container maxW="container.lg" textAlign="center">
       <Heading as="h2" size="xl" mb={8}>Choose Your Plan...</Heading>
       <SimpleGrid columns={{ base: 1, md: 3 }} spacing={10}>
@@ -255,7 +255,7 @@ const PricingSection = () => {
 );
 };
 const Developer = () => (
-  <Box p={60}>
+  <Box id="contact" p={60}>
     <Container maxW="container.lg">
       <Heading as="h2" size="xl" textAlign="center" mb={8}>
         Developer
@@ -294,21 +294,18 @@ const Developer = () => (
 
 const Footer = () => (
   <Box py={6} bg="gray.900" color="white">
-    <Container maxW="container.lg" display="flex" justifyContent="space-between" alignItems="center">
-      <Text>&copy; {new Date().getFullYear()} Cold Mailer. All rights reserved.</Text>
-      <HStack spacing={4}>
-        <Link href="/about" color="teal.200">About</Link>
-        <Link href="/contact" color="teal.200">Contact</Link>
-        <Link href="/privacy" color="teal.200">Privacy Policy</Link>
-      </HStack>
-      <HStack spacing={4}>
-        <IconButton as="a" href="https://facebook.com" icon={<FaFacebook />} colorScheme="teal" />
-        <IconButton as="a" href="https://twitter.com" icon={<FaTwitter />} colorScheme="teal" />
-        <IconButton as="a" href="https://linkedin.com" icon={<FaLinkedin />} colorScheme="teal" />
-      </HStack>
+    <Container maxW="container.lg" display="flex" justifyContent="center" alignItems="center" borderBottom="1px" borderColor="gray.700" pb={4} mb={4}>
+      <Text fontSize="lg" fontWeight="bold">&copy; {new Date().getFullYear()} Cold Mailer. All rights reserved. 🇮🇳</Text>
+    </Container>
+    <Container maxW="container.lg" display="flex" justifyContent="center" alignItems="center">
+      <Text fontSize="md" color="gray.400">This is a beta product. The final version will be published soon. </Text>
+    </Container>
+    <Container maxW="container.lg" display="flex" justifyContent="center" alignItems="center" mt={4}>
+      <Text fontSize="sm" color="gray.500">-  Unique Panghal 👑</Text>
     </Container>
   </Box>
 );
+
 
 const LandingPage = () => (
   <ThemeProvider>
