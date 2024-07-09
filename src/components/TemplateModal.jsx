@@ -14,9 +14,8 @@ import {
   Input,
   Textarea,
 } from '@chakra-ui/react';
-import { useThemeContext } from './ThemeContext'; // Adjust the path as necessary
-
-
+import { useThemeContext } from './ThemeContext'; 
+//https://cold-mailer-back.onrender.com
 const TemplateModal = ({ onTemplateCreated }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const initialRef = React.useRef(null);
@@ -27,27 +26,29 @@ const TemplateModal = ({ onTemplateCreated }) => {
   const [templateName, setTemplateName] = useState('');
   const [subject, setSubject] = useState('');
   const [to, setTo] = useState('');
-
   const [body, setBody] = useState('');
+  const [file, setFile] = useState(null);
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
 
   const handleCreateTemplate = async () => {
     const userId = localStorage.getItem('userId');
-
-    const newTemplate = {
-      name: templateName,
-      to,
-      subject,
-      body,
-      userId,
-    };
+    const formData = new FormData();
+    formData.append('name', templateName);
+    formData.append('to', to);
+    formData.append('subject', subject);
+    formData.append('body', body);
+    formData.append('userId', userId);
+    if (file) {
+      formData.append('file', file);
+    }
 
     try {
       const response = await fetch('https://cold-mailer-back.onrender.com/api/templates', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newTemplate),
+        body: formData,
       });
 
       if (response.ok) {
@@ -64,11 +65,7 @@ const TemplateModal = ({ onTemplateCreated }) => {
   return (
     <>
       <Button bg={currentTheme.nodeBg} color={currentTheme.nodeColor} onClick={onOpen}>Create Template</Button>
-      <Modal
-        initialFocusRef={initialRef}
-        isOpen={isOpen}
-        onClose={onClose}
-      >
+      <Modal initialFocusRef={initialRef} isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Create New Template</ModalHeader>
@@ -93,7 +90,6 @@ const TemplateModal = ({ onTemplateCreated }) => {
                 required
               />
             </FormControl>
-
             <FormControl mt={4}>
               <FormLabel>Subject</FormLabel>
               <Input
@@ -103,7 +99,6 @@ const TemplateModal = ({ onTemplateCreated }) => {
                 required
               />
             </FormControl>
-
             <FormControl mt={4}>
               <FormLabel>Body</FormLabel>
               <Textarea
@@ -112,6 +107,10 @@ const TemplateModal = ({ onTemplateCreated }) => {
                 onChange={(e) => setBody(e.target.value)}
                 required
               />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel>Attachment (Optional)</FormLabel>
+              <Input type="file" onChange={handleFileChange} />
             </FormControl>
           </ModalBody>
           <ModalFooter>
